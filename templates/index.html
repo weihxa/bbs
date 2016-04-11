@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block bokezhengwen %}
+    <div class="l_box f_l">
+    <div class="banner">
+      <div id="slide-holder">
+        <div id="slide-runner">
+            {% for item in new_list %}
+                <a href="{{ item.url }}" target="_blank"><img id="slide-img-{{ item.id }}" src="/static/{{ item.image_urls }}"  alt="" /></a>
+            {% endfor%}
+        <!--
+            <a href="/" target="_blank"><img id="slide-img-1" src="/static/images/a1.jpg"  alt="" /></a>
+            <a href="/" target="_blank"><img id="slide-img-2" src="/static/images/a2.jpg"  alt="" /></a>
+            <a href="/" target="_blank"><img id="slide-img-3" src="/static/images/a3.jpg"  alt="" /></a>
+            <a href="/" target="_blank"><img id="slide-img-4" src="/static/images/a4.jpg"  alt="" /></a>
+            -->
+          <div id="slide-controls">
+            <p id="slide-client" class="text"><strong></strong><span></span></p>
+            <p id="slide-desc" class="text"></p>
+            <p id="slide-nav"></p>
+          </div>
+        </div>
+      </div>
+      <script>
+          if(!window.slider) {
+              var slider={};
+          }
+          slider.data= [
+                  {% for item in new_list %}
+                      {
+                  "id":"slide-img-{{ item.id }}", // 与slide-runner中的img标签id对应
+                  "client":"标题：{{ item.title }}",
+                  "desc":"来源：{{ item.summary|slice:":30"}}" //这里修改描述
+              },
+              {% endfor %}
+            ]
+      </script>
+    </div>
+    <!-- banner代码 结束 -->
+    <div class="topnews">
+      <h2><span><a href="/article/" style="color: #F77825;" >更多...</a></span><b>文章</b>推荐</h2>
+        {% for post in blog_list %}
+        <div class="blogs">
+        <figure><img src="/static/{{ post.image_urls }}"></figure>
+        <ul>
+          <h3><a href="/blogtext/{{ post.id }}" >{{ post.title }}</a></h3>
+          <p><span style="height:auto; font-weight:bold;font-size: 15px;">简述：</span>{{ post.body|slice:":300"|striptags|add:'...........'}}</p>
+          <p class="autor"><span class="lm f_l"><a href="/index/">个人博客</a></span><span class="dtime f_l">{{ post.timestamp|date:"Y-m-d H:i:s" }}</span><span class="viewnum f_r"><a href='#' onclick="Favor(this,{{ post.id }});">赞( {{ post.favor_count }} )</a></span><!--<span class="pingl f_r">评论（<a href="/blogtext/{{ post.id }}">30</a>）</span>--></p>
+        </ul>
+      </div>
+        {% endfor %}
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+        function Favor(doc,id){
+            //点赞
+            $.ajax({
+                url:'/addfavor/',
+                data:{nid:id},
+                type:'POST',
+                success:function(callback){
+                    var obj = jQuery.parseJSON(callback);
+                    if(obj.status == 1){
+                        var temp ="赞"+"( "+ obj.data +" )"
+                        $(doc).text(temp)
+                    }
+                }
+            });
+        }
+    </script>
+     <script language="javascript">
+        function ad_left(){
+        document.getElementById('ad_left').style.display="none";
+        }
+        function ad_right(){
+        document.getElementById('ad_right').style.display="none";
+        }
+    </script>
+{% endblock %}
